@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>海康威视播放器</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="stylesheet" href="/app.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <div class="brand">
+        <div class="brand-mark" aria-hidden="true"><img src="/app-icon.svg" alt=""></div>
+        <div>
+          <p class="eyebrow">HIKVISION LOCAL VIEW</p>
+          <h1>海康威视播放器</h1>
+        </div>
+      </div>
+      <div class="engine-status" id="engineStatus">
+        <span class="status-dot"></span>
+        <span>正在启动播放引擎</span>
+      </div>
+    </header>
+
+    <main class="workspace" id="workspace">
+      <section class="viewer-card" id="viewerCard">
+        <div class="viewer-toolbar">
+          <div class="live-title">
+            <span class="live-dot"></span>
+            <strong>实时预览</strong>
+            <span class="stream-label" id="streamLabel">尚未连接</span>
+          </div>
+          <div class="viewer-actions">
+            <button class="icon-button" id="refreshPlayer" type="button" title="重新加载画面" disabled>↻</button>
+            <button class="text-button" id="fullscreenButton" type="button">全屏播放</button>
+          </div>
+        </div>
+
+        <div class="viewer-stage" id="viewerStage">
+          <div class="player-grid" id="playerGrid" aria-label="实时监控画面"></div>
+          <div class="empty-state" id="emptyState">
+            <div class="empty-illustration">
+              <span class="corner top-left"></span><span class="corner top-right"></span>
+              <span class="camera-eye"></span>
+              <span class="corner bottom-left"></span><span class="corner bottom-right"></span>
+            </div>
+            <h2>等待连接录像机</h2>
+            <p>在右侧填写设备信息，选择通道和码流后开始播放。</p>
+          </div>
+          <div class="loading-state" id="loadingState" hidden>
+            <span class="spinner"></span>
+            <strong>正在建立实时视频连接</strong>
+            <small>读取通道并测试 RTSP 码流，请稍候…</small>
+          </div>
+        </div>
+
+        <div class="viewer-footer">
+          <span id="connectionDetail">本机低延迟播放 · 数据不会上传到互联网</span>
+          <span class="codec-note">若主码流黑屏，请将录像机主码流编码改为 H.264</span>
+        </div>
+      </section>
+
+      <aside class="settings-card" id="settingsPanel">
+        <div class="panel-heading">
+          <div>
+            <p class="eyebrow">DEVICE CONNECTION</p>
+            <h2>连接录像机</h2>
+          </div>
+          <div class="panel-actions">
+            <span class="version">v1.3.0</span>
+            <button class="sidebar-toggle collapse-sidebar" id="collapseSidebarButton" type="button" title="收起连接面板" aria-label="收起连接面板" aria-controls="settingsPanel" aria-expanded="true">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m7.5 4.5 5 5.5-5 5.5"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <form id="connectionForm" autocomplete="off">
+          <label class="field">
+            <span>录像机地址</span>
+            <input id="host" name="host" type="text" inputmode="url" placeholder="192.168.1.100" required>
+          </label>
+
+          <div class="field-row">
+            <label class="field">
+              <span>用户名</span>
+              <input id="username" name="username" type="text" placeholder="admin" required>
+            </label>
+            <label class="field password-field">
+              <span>密码</span>
+              <input id="password" name="password" type="password" required>
+              <button id="togglePassword" type="button" class="peek-button" aria-label="显示或隐藏密码">显示</button>
+            </label>
+          </div>
+
+          <fieldset class="layout-picker">
+            <legend>画面布局</legend>
+            <div class="layout-control">
+              <label>
+                <input type="radio" name="layout" value="single" checked>
+                <span><strong>单画面</strong><small>播放指定通道</small></span>
+              </label>
+              <label>
+                <input type="radio" name="layout" value="grid4">
+                <span><strong>四画面</strong><small>最多同时 4 路</small></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <div id="channelSection">
+            <div class="channel-heading">
+              <label for="channel">监控通道</label>
+              <button id="discoverButton" type="button" class="link-button">重新读取通道</button>
+            </div>
+            <select id="channel" name="channel" required>
+              <option value="1">通道 1</option>
+            </select>
+            <p class="field-help" id="channelHelp">连接时会自动读取录像机的真实通道编号</p>
+          </div>
+
+          <fieldset class="stream-picker">
+            <legend>播放码流</legend>
+            <div class="segment-control">
+              <label>
+                <input type="radio" name="stream" value="sub" checked>
+                <span><strong>子码流</strong><small>更流畅，推荐</small></span>
+              </label>
+              <label>
+                <input type="radio" name="stream" value="main">
+                <span><strong>主码流</strong><small>画质更清晰</small></span>
+              </label>
+            </div>
+          </fieldset>
+
+          <label class="remember-row">
+            <input id="rememberPassword" type="checkbox">
+            <span>在这台电脑上记住密码</span>
+          </label>
+          <p class="security-note">密码安全保存在 macOS 钥匙串中。</p>
+
+          <button class="connect-button" id="connectButton" type="submit">
+            <span class="button-dot"></span>
+            <span>连接并播放</span>
+          </button>
+          <button class="disconnect-button" id="disconnectButton" type="button" disabled>停止播放</button>
+        </form>
+
+        <div class="message" id="message" role="status" aria-live="polite">
+          <span class="message-icon">i</span>
+          <span>播放器已准备就绪。</span>
+        </div>
+      </aside>
+
+      <button class="sidebar-toggle expand-sidebar" id="expandSidebarButton" type="button" title="展开连接面板" aria-label="展开连接面板" aria-controls="settingsPanel" aria-expanded="false" hidden>
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="m12.5 4.5-5 5.5 5 5.5"/></svg>
+      </button>
+    </main>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>

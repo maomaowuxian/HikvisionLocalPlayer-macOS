@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="海康威视播放器">
+  <defs>
+    <linearGradient id="iconBackground" x1="36" y1="24" x2="218" y2="238" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#f23b48"/>
+      <stop offset="1" stop-color="#bd1723"/>
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="240" height="240" rx="54" fill="url(#iconBackground)"/>
+  <rect x="15" y="15" width="226" height="226" rx="47" fill="none" stroke="#ff7780" stroke-opacity=".72" stroke-width="4"/>
+  <path d="M78 72h30v40h40V72h30v112h-30v-40h-40v40H78z" fill="#fff"/>
+</svg>
