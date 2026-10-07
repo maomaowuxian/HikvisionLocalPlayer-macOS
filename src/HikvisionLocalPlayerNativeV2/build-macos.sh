@@ -28,6 +28,7 @@ swiftc \
   "$SCRIPT_DIR/MainViewController.swift" \
   "$SCRIPT_DIR/main.swift" \
   -O -whole-module-optimization \
+  -target "$(uname -m)-apple-macosx15.0" \
   -framework AppKit \
   -framework AVFoundation \
   -framework QuartzCore \
@@ -67,7 +68,7 @@ cat > "$CONTENTS/Info.plist" <<PLIST
   <key>CFBundleIconFile</key>
   <string>AppIcon</string>
   <key>LSMinimumSystemVersion</key>
-  <string>13.0</string>
+  <string>15.0</string>
   <key>NSHighResolutionCapable</key>
   <true/>
   <key>NSLocalNetworkUsageDescription</key>

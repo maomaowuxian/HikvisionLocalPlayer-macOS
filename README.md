@@ -25,7 +25,7 @@
 
 ## 平台与限制
 
-- 当前打包目标：macOS Intel x86-64；随附 go2rtc 1.9.14 macOS amd64。
+- 当前发布包要求 macOS 15 或更新版本，架构为 Intel x86-64；随附 go2rtc 1.9.14 macOS amd64。
 - 当前接收器用于 H.264 实时视频预览。请将录像机目标码流设为 H.264；H.265、音频播放及录像回放尚未实现。
 - Apple Silicon 尚未完成原生打包和设备验证。
 - 本项目使用本机回环端口 1984（go2rtc API）、8554（RTSP）和 8555（go2rtc 配置中的 WebRTC 监听）。当前原生播放使用 RTSP/TCP。
