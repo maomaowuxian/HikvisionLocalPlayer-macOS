@@ -10,7 +10,7 @@ CONTENTS="$APP/Contents"
 MACOS="$CONTENTS/MacOS"
 RESOURCES="$CONTENTS/Resources"
 NATIVE_EXE="$MACOS/HikvisionLocalPlayerApp"
-VERSION="2.0.8"
+VERSION="2.0.9"
 
 rm -rf "$APP"
 mkdir -p "$MACOS" "$RESOURCES"

@@ -56,13 +56,6 @@ final class PlayerButton: NSButton {
         let size = label.size()
         label.draw(at: NSPoint(x: (bounds.width - size.width) / 2,
                                y: (bounds.height - size.height) / 2))
-        if window?.firstResponder === self {
-            NSColor.keyboardFocusIndicatorColor.setStroke()
-            let focus = NSBezierPath(roundedRect: bounds.insetBy(dx: 2, dy: 2),
-                                     xRadius: 7, yRadius: 7)
-            focus.lineWidth = 2
-            focus.stroke()
-        }
     }
 }
 

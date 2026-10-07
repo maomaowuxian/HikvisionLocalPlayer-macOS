@@ -3,6 +3,7 @@ import AVFoundation
 import QuartzCore
 
 final class VideoTileView: NSView {
+    var onDoubleClick: (() -> Void)?
     private let stream: ConnectedStream
     private var displayLayer = AVSampleBufferDisplayLayer()
     private let labelBackground = NSView()
@@ -34,10 +35,7 @@ final class VideoTileView: NSView {
         layer?.addSublayer(displayLayer)
 
         labelBackground.wantsLayer = true
-        labelBackground.layer?.backgroundColor = PlayerTheme.input.withAlphaComponent(0.88).cgColor
-        labelBackground.layer?.borderWidth = 1
-        labelBackground.layer?.borderColor = PlayerTheme.border.cgColor
-        labelBackground.layer?.cornerRadius = 6
+        labelBackground.layer?.backgroundColor = NSColor.clear.cgColor
         labelBackground.isHidden = !showLabel
         addSubview(labelBackground)
 
@@ -47,6 +45,11 @@ final class VideoTileView: NSView {
         labelField.lineBreakMode = .byTruncatingTail
         labelField.maximumNumberOfLines = 1
         labelField.isHidden = !showLabel
+        let textShadow = NSShadow()
+        textShadow.shadowColor = NSColor.black.withAlphaComponent(0.9)
+        textShadow.shadowBlurRadius = 2
+        textShadow.shadowOffset = NSSize(width: 0, height: -1)
+        labelField.shadow = textShadow
         labelBackground.addSubview(labelField)
         liveDot.wantsLayer = true
         liveDot.layer?.backgroundColor = PlayerTheme.red.cgColor
@@ -58,6 +61,17 @@ final class VideoTileView: NSView {
 
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+
+    override func acceptsFirstMouse(for event: NSEvent?) -> Bool { true }
+
+    // The channel label is also part of the video click target.
+    override func hitTest(_ point: NSPoint) -> NSView? {
+        super.hitTest(point) == nil ? nil : self
+    }
+
+    override func mouseDown(with event: NSEvent) {
+        if event.clickCount == 2 { onDoubleClick?() }
     }
 
     override func layout() {
@@ -223,12 +237,18 @@ final class VideoTileView: NSView {
 
 final class PlayerGridView: NSView {
     private var tiles: [VideoTileView] = []
+    private var focusedTile: VideoTileView?
+    var onFocusChanged: ((Bool) -> Void)?
+    var hasFocusedTile: Bool { focusedTile != nil }
     private var isPaused = false
     private let emptyLabel = NSTextField(labelWithString: "等待连接录像机")
     private let unconfiguredLabel = NSTextField(labelWithString: "＋  未配置通道")
 
     var currentLayout: LayoutChoice = .single {
-        didSet { needsLayout = true }
+        didSet {
+            if currentLayout != .grid4 { restoreGrid() }
+            needsLayout = true
+        }
     }
 
     override init(frame frameRect: NSRect) {
@@ -262,8 +282,17 @@ final class PlayerGridView: NSView {
             height: 24
         )
 
-        unconfiguredLabel.isHidden = currentLayout != .grid4 || tiles.isEmpty || tiles.count >= 4
+        unconfiguredLabel.isHidden = focusedTile != nil || currentLayout != .grid4 || tiles.isEmpty || tiles.count >= 4
         guard !tiles.isEmpty else { return }
+
+        if let focusedTile {
+            for tile in tiles {
+                tile.isHidden = tile !== focusedTile
+                tile.frame = tile === focusedTile ? bounds : .zero
+            }
+            return
+        }
+        tiles.forEach { $0.isHidden = false }
 
         switch currentLayout {
         case .single:
@@ -327,6 +356,17 @@ final class PlayerGridView: NSView {
                 showLabel: layout == .grid4,
                 initiallyPaused: isPaused
             )
+            tile.onDoubleClick = { [weak self, weak tile] in
+                guard let self, let tile, self.currentLayout == .grid4 else { return }
+                if self.focusedTile != nil {
+                    self.restoreGrid()
+                } else {
+                    self.focusedTile = tile
+                    self.needsLayout = true
+                    self.layoutSubtreeIfNeeded()
+                    self.onFocusChanged?(true)
+                }
+            }
             addSubview(tile)
             tiles.append(tile)
         }
@@ -336,6 +376,7 @@ final class PlayerGridView: NSView {
     }
 
     func clearPlayers() {
+        restoreGrid()
         for tile in tiles {
             tile.stop()
             tile.removeFromSuperview()
@@ -343,6 +384,14 @@ final class PlayerGridView: NSView {
         tiles.removeAll()
         emptyLabel.isHidden = false
         needsLayout = true
+    }
+
+    func restoreGrid(notify: Bool = true) {
+        guard focusedTile != nil else { return }
+        focusedTile = nil
+        needsLayout = true
+        layoutSubtreeIfNeeded()
+        if notify { onFocusChanged?(false) }
     }
 
     func pauseAll() {

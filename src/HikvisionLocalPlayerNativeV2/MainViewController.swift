@@ -51,6 +51,7 @@ final class MainViewController: NSViewController {
     private var contentBottom: NSLayoutConstraint!
     private var isFullscreenLayout = false
     private var settingsHiddenBeforeFullscreen = false
+    private var enteredFullscreenForTile = false
 
     private var channelIds: [Int] = []
     private var currentStreams: [ConnectedStream] = []
@@ -238,6 +239,9 @@ final class MainViewController: NSViewController {
         toolbar.addSubview(actions)
 
         playerGrid.translatesAutoresizingMaskIntoConstraints = false
+        playerGrid.onFocusChanged = { [weak self] focused in
+            self?.tileFocusChanged(focused)
+        }
         card.addSubview(playerGrid)
 
         let footer = NSView()
@@ -297,7 +301,7 @@ final class MainViewController: NSViewController {
 
         let title = makeLabel("连接录像机", size: 19, weight: .semibold, color: .white)
         let subtitle = makeLabel(
-            "DEVICE CONNECTION · v2.0.8",
+            "DEVICE CONNECTION · v2.0.9",
             size: 10,
             weight: .medium,
             color: PlayerTheme.red
@@ -641,6 +645,10 @@ final class MainViewController: NSViewController {
     }
 
     func setFullscreenLayout(_ fullscreen: Bool) {
+        if !fullscreen {
+            enteredFullscreenForTile = false
+            playerGrid.restoreGrid(notify: false)
+        }
         guard isViewLoaded, isFullscreenLayout != fullscreen else { return }
         isFullscreenLayout = fullscreen
         topBar.isHidden = fullscreen
@@ -660,6 +668,17 @@ final class MainViewController: NSViewController {
         view.layoutSubtreeIfNeeded()
         NSLog("Fullscreen layout=%d headerHidden=%d contentTop=%.0f",
               fullscreen ? 1 : 0, topBar.isHidden ? 1 : 0, contentTop.constant)
+    }
+
+    private func tileFocusChanged(_ focused: Bool) {
+        guard let window = view.window else { return }
+        if focused {
+            enteredFullscreenForTile = !window.styleMask.contains(.fullScreen)
+            if enteredFullscreenForTile { window.toggleFullScreen(nil) }
+        } else if enteredFullscreenForTile {
+            enteredFullscreenForTile = false
+            if window.styleMask.contains(.fullScreen) { window.toggleFullScreen(nil) }
+        }
     }
 
     @objc private func fullscreenPressed() {
@@ -858,6 +877,7 @@ final class MainViewController: NSViewController {
     private func styleSecondaryButton(_ button: NSButton) {
         button.bezelStyle = .regularSquare
         button.isBordered = false
+        button.focusRingType = .none
         button.font = NSFont.systemFont(ofSize: 12, weight: .medium)
         button.contentTintColor = PlayerTheme.text
     }
