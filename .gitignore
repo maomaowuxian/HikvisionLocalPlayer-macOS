@@ -3,3 +3,9 @@
 **/obj/
 build/
 outputs/
+outputs-v2/
+*.dSYM/
+*.log
+native-v2-settings.json
+settings.dat
+go2rtc-native-v2.yaml

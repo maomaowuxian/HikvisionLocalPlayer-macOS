@@ -1,6 +1,6 @@
 # 第三方组件说明
 
-本项目内置 [go2rtc](https://github.com/AlexxIT/go2rtc) 作为本机 RTSP 到 WebRTC/MSE 的媒体桥接组件。
+本项目内置 [go2rtc](https://github.com/AlexxIT/go2rtc) 作为本机媒体转发组件。当前原生版通过它获取 RTSP/TCP 视频；历史 v1 实现还使用过 WebRTC/MSE。
 
 - 组件版本：1.9.14
 - 构建：官方 macOS Intel x86-64（go2rtc_mac_amd64.zip）
