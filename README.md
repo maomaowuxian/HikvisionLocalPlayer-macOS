@@ -11,6 +11,12 @@
 
 界面与视频均由原生组件承载。运行时使用主程序和内置 go2rtc，构建当前版本只需要 Xcode / Swift 工具链。
 
+## 界面示例
+
+![海康威视播放器 v2.0.8 原生界面与四画面预览](docs/images/native-v2-preview.png)
+
+四画面预览示例：三路已连接，监控画面已打码。
+
 ## 功能
 
 - 单画面 / 四画面，最多同时预览四个通道。
@@ -92,7 +98,7 @@ v1 的 WKWebView / .NET 实现作为历史参考保留。当前版本从 `Hikvis
 - 运行目录：`~/Library/Application Support/HikvisionLocalPlayer/Runtime`。
 - 录像机密码：macOS Keychain，Service 为 `io.github.maomaowuxian.hikvisionlocalplayer`。
 - 设置迁移可读取旧版 `settings.dat`，密码仍从 Keychain 获取。
-- 服务监听本机回环地址。连接配置、录像画面、运行日志和本机构建产物不随源码提交。
+- 服务监听本机回环地址。连接配置、未脱敏录像画面、运行日志和本机构建产物不随源码提交；README 示例截图已打码。
 
 ## 免责声明
 
